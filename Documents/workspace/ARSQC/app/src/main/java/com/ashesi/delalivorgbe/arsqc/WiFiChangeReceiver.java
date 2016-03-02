@@ -49,9 +49,6 @@ public class WiFiChangeReceiver extends BroadcastReceiver {
             appContext.stopService(new Intent(appContext, UploadService.class));
         }
 
-
-
-
     }
 
     private boolean isUploadServiceRunning(Class<?> serviceClass) {

@@ -538,7 +538,6 @@ public class MainActivity extends AppCompatActivity implements OkHTTPAsync.OkHtt
         uploadFileButton.setText(String.valueOf(getDirSize()/1024)+"KB to upload");
     }
 
-
     public String getTodayTimestamp(){
         return timeStamp;
     }
