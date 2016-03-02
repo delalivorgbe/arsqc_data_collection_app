@@ -6,15 +6,6 @@ android:shape="rectangle"   >
     android:color="@color/text_color_red" >
 </solid>
 
-<!--solid
-    android:color="#888888" >
-</solid>
-
-<stroke
-    android:width="2dp"
-    android:color="#C4CDE0" >
-</stroke-->
-
 <padding
     android:left="5dp"
     android:top="5dp"
