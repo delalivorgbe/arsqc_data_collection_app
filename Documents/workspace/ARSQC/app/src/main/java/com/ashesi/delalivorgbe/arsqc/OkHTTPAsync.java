@@ -88,6 +88,8 @@ public class OkHTTPAsync extends AsyncTask<File, Integer, String> {
                 }else{
                     System.out.println("Delete failed "+ fileToUpload.getName());
                 }
+            }else{
+
             }
         } catch (Exception e) {
             e.printStackTrace();
