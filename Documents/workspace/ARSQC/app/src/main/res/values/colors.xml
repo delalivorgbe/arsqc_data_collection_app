@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="background_color">#f0f0f0</color>
+    <color name="text_color_red">#ff4444</color>
+    <color name="green">#99cc00</color>
+    <color name="main_accent">#669900</color>
+    <color name="belize">#2980b9</color>
+    <color name="secondary_green">#47a82b</color>
+    <color name="primary_green">#398622</color>
+    <color name="bad_upload_highlight">#10ff4444</color>
+    <color name="good_upload_highlight">#ffffff</color>
+    <color name="image_back">#ecf0f1</color>
+    <color name="silver_grey">#908c96a0</color>
+    <color name="traffic_black">#141e28</color>
+    <color name="exp_dark_grey">#373c49</color>
+
+
+    <color name="white">#FFFFFF</color>
+    <color name="mygreen">#0e9c57</color>
+    <color name="mygreen_pressed">#0e9c37</color>
+    <color name="grey_pressed">#600e9c57</color>
+    <color name="red_pressed">#60ff4444</color>
+    <color name="primary_text_">#90212121</color>
+    <color name="asphalt">#34495e</color>
+
+</resources>
