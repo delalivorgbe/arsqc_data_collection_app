@@ -26,6 +26,7 @@ public class UploadService extends Service {
         sdf = new SimpleDateFormat(sdfString);
         timeStamp = sdf.format(c.getTime());
         fileExtension = ".txt";
+
     }
 
     @Override

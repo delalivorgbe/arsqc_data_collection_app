@@ -81,15 +81,15 @@ public class OkHTTPAsync extends AsyncTask<File, Integer, String> {
             System.out.println(responseBody);
 
             if(responseBody.equals("success")){
+
                 System.out.println("successfully uploaded " + fileToUpload.getName());
+
                 if(fileToUpload.delete()){
                     System.out.println("successfully deleted " + fileToUpload.getName());
                     mActivity.resetUploadButton();
                 }else{
                     System.out.println("Delete failed "+ fileToUpload.getName());
                 }
-            }else{
-
             }
         } catch (Exception e) {
             e.printStackTrace();

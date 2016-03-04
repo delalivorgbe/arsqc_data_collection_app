@@ -7,6 +7,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.internal.widget.AdapterViewCompat;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -17,8 +18,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -30,9 +33,12 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RadioButton;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -40,7 +46,7 @@ import android.provider.Settings.Secure;
 
 
 
-public class MainActivity extends AppCompatActivity implements OkHTTPAsync.OkHttpCallback, SensorEventListener, LocationListener{
+public class MainActivity extends AppCompatActivity implements OkHTTPAsync.OkHttpCallback, SensorEventListener, LocationListener, AdapterView.OnItemSelectedListener {
 
     private static final String TAG = "MainActivity.java";
 
@@ -54,7 +60,14 @@ public class MainActivity extends AppCompatActivity implements OkHTTPAsync.OkHtt
 
     private Uri fileUri;
 
-    ImageView iv;
+    private ImageView iv;
+    private Spinner vehicleAgeSpinner;
+    private Spinner vehicleClassSpinner;
+    private Spinner vehicleConditionSpinner;
+
+    ArrayAdapter<String> vehicleClassAdapter;
+    ArrayAdapter<String> vehicleConditionAdapter;
+    ArrayAdapter<String> vehicleAgeAdapter;
 
     private SensorManager senSensorManager;
     private Sensor senAccelerometer;
@@ -94,6 +107,10 @@ public class MainActivity extends AppCompatActivity implements OkHTTPAsync.OkHtt
     private String phoneName;
     private int sensorDelay;
 
+    private String vehicleAge;
+    private String vehicleClass;
+    private String vehicleCondition;
+
     static final int READ_BLOCK_SIZE = 100;
 
     @Override
@@ -122,6 +139,51 @@ public class MainActivity extends AppCompatActivity implements OkHTTPAsync.OkHtt
         sampleMidRadioButton = (RadioButton) findViewById(R.id.sampleMidRadioButton);
         sampleFastRadioButton = (RadioButton) findViewById(R.id.sampleFastRadioButton);
         sampleSnailRadioButton = (RadioButton) findViewById(R.id.sampleSnailRadioButton);
+
+        vehicleAge = vehicleClass = vehicleCondition = "";
+
+        vehicleAgeSpinner = (Spinner) findViewById(R.id.vehicle_age);
+        vehicleClassSpinner = (Spinner) findViewById(R.id.vehicle_type);
+        vehicleConditionSpinner = (Spinner) findViewById(R.id.vehicle_condition);
+
+        vehicleAgeSpinner.setOnItemSelectedListener(this);
+        vehicleClassSpinner.setOnItemSelectedListener(this);
+        vehicleConditionSpinner.setOnItemSelectedListener(this);
+
+
+        List<String> carAgeCategories = new ArrayList<String>();
+        carAgeCategories.add("< 1 year");
+        carAgeCategories.add("1 - 2 years");
+        carAgeCategories.add("2 - 3 years");
+        carAgeCategories.add("3 - 4 years");
+        carAgeCategories.add("> 5 years");
+
+
+        List<String> carClassCategories = new ArrayList<String>();
+        carClassCategories.add("Micro car");
+        carClassCategories.add("Saloon car");
+        carClassCategories.add("SUV");
+        carClassCategories.add("4 wheel drive");
+        carClassCategories.add("Bus");
+
+
+        List<String> carConditionCategories = new ArrayList<String>();
+        carConditionCategories.add("Well maintained");
+        carConditionCategories.add("Fairly maintained");
+        carConditionCategories.add("Poorly maintained");
+
+        vehicleAgeAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, carAgeCategories);
+        vehicleAgeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        vehicleAgeSpinner.setAdapter(vehicleAgeAdapter);
+
+        vehicleClassAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, carClassCategories);
+        vehicleClassAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        vehicleClassSpinner.setAdapter(vehicleClassAdapter);
+
+        vehicleConditionAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, carConditionCategories);
+        vehicleConditionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        vehicleConditionSpinner.setAdapter(vehicleConditionAdapter);
+
 
         sensorDelay = SensorManager.SENSOR_DELAY_UI;
         sampleSlowRadioButton.setChecked(true);
@@ -204,8 +266,7 @@ public class MainActivity extends AppCompatActivity implements OkHTTPAsync.OkHtt
                 Float y = sensorEvent.values[1];
                 Float z = sensorEvent.values[2];
 
-                writeToFile(x, y, z, speed, longitude, latitude);
-
+                writeToFile(x, y, z, speed, longitude, latitude, vehicleClass, vehicleAge, vehicleCondition);
 
                 txtView.setText("x-linear: "+x.toString() + "\n y-linear: " + y.toString() +
                         "\n z-linear: " + z.toString()+ "\n speed: " + speed.toString()+
@@ -263,8 +324,38 @@ public class MainActivity extends AppCompatActivity implements OkHTTPAsync.OkHtt
         // TODO Auto-generated method stub
     }
 
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        // On selecting a spinner item
+        String item = parent.getItemAtPosition(position).toString();
 
-    public void writeToFile(Float x, Float y, Float z, Float speed, Double longitude, Double latitude){
+
+        Spinner spinner = (Spinner) parent;
+        if(spinner.getId() == R.id.vehicle_age)
+        {
+            vehicleAge = parent.getItemAtPosition(position).toString();
+        }
+        else if(spinner.getId() == R.id.vehicle_type)
+        {
+            vehicleClass = parent.getItemAtPosition(position).toString();
+        }else if(spinner.getId() == R.id.vehicle_condition)
+        {
+            vehicleCondition = parent.getItemAtPosition(position).toString();
+        }
+
+
+        // Showing selected spinner item
+        //Toast.makeText(parent.getContext(), "Selected: " + item, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
+
+
+    public void writeToFile(Float x, Float y, Float z, Float speed, Double longitude, Double latitude,
+                            String vehicleClass, String vehicleAge, String vehicleCondition){
         try {
             FileOutputStream fileout=openFileOutput(filename, Context.MODE_APPEND);
             OutputStreamWriter outputWriter=new OutputStreamWriter(fileout);
@@ -276,7 +367,8 @@ public class MainActivity extends AppCompatActivity implements OkHTTPAsync.OkHtt
                     "|"+x.toString()+"|"+y.toString()+"|"+z.toString()+
                     "|"+gravityX+"|"+gravityY+"|"+gravityZ+
                     "|"+ speed.toString()+"|"+accuracy.toString()+
-                    "|"+longitude.toString()+"|"+latitude.toString()+"\n";
+                    "|"+longitude.toString()+"|"+latitude.toString()+"|"+vehicleClass+
+                    "|"+vehicleAge+"|"+vehicleCondition+"\n";
             outputWriter.write(line);
             outputWriter.close();
 
@@ -537,6 +629,7 @@ public class MainActivity extends AppCompatActivity implements OkHTTPAsync.OkHtt
 
         uploadFileButton.setText(String.valueOf(getDirSize()/1024)+"KB to upload");
     }
+
 
     public String getTodayTimestamp(){
         return timeStamp;

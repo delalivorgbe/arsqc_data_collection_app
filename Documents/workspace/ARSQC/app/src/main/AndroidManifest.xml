@@ -29,11 +29,11 @@
             </intent-filter>
         </activity>
 
-        <servic
+        <service
             android:name=".UploadService"
             android:enabled="true"
-            android:exported="true"  >
-        </servic>
+            android:exported="true" >
+        </service>
 
         <receiver
             android:name=".WiFiChangeReceiver"
