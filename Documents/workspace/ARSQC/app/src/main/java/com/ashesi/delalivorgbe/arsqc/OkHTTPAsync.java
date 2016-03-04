@@ -20,12 +20,6 @@ import java.util.concurrent.TimeUnit;
 public class OkHTTPAsync extends AsyncTask<File, Integer, String> {
 
 
-    public interface OkHttpCallback {
-        void call();
-    }
-
-    private OkHttpCallback callerActivity;
-
     private File fileToUpload;
 
     private Context appContext;
@@ -34,8 +28,7 @@ public class OkHTTPAsync extends AsyncTask<File, Integer, String> {
 
 
     public OkHTTPAsync(File upFile, MainActivity activity){
-        callerActivity = (OkHttpCallback)activity;
-        mActivity = activity;
+        mActivity = (MainActivity)activity;
         fileToUpload = upFile;
         appContext = ApplicationContextProvider.getContext();
     }
@@ -81,15 +74,15 @@ public class OkHTTPAsync extends AsyncTask<File, Integer, String> {
             System.out.println(responseBody);
 
             if(responseBody.equals("success")){
+
                 System.out.println("successfully uploaded " + fileToUpload.getName());
+
                 if(fileToUpload.delete()){
                     System.out.println("successfully deleted " + fileToUpload.getName());
-                    mActivity.resetUploadButton();
+                    //mActivity.resetUploadButton();
                 }else{
                     System.out.println("Delete failed "+ fileToUpload.getName());
                 }
-            }else{
-
             }
         } catch (Exception e) {
             e.printStackTrace();

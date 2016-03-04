@@ -22,10 +22,11 @@ public class UploadService extends Service {
 
     public UploadService() {
         c = Calendar.getInstance();
-        sdfString = "dd-MM-yy";
+        sdfString = "dd-MM-yy-ss";
         sdf = new SimpleDateFormat(sdfString);
         timeStamp = sdf.format(c.getTime());
         fileExtension = ".txt";
+
     }
 
     @Override
