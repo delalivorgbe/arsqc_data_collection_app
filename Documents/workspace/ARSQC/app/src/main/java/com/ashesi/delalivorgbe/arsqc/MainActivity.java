@@ -46,7 +46,7 @@ import android.provider.Settings.Secure;
 
 
 
-public class MainActivity extends AppCompatActivity implements OkHTTPAsync.OkHttpCallback, SensorEventListener, LocationListener, AdapterView.OnItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements SensorEventListener, LocationListener, AdapterView.OnItemSelectedListener {
 
     private static final String TAG = "MainActivity.java";
 
@@ -140,7 +140,9 @@ public class MainActivity extends AppCompatActivity implements OkHTTPAsync.OkHtt
         sampleFastRadioButton = (RadioButton) findViewById(R.id.sampleFastRadioButton);
         sampleSnailRadioButton = (RadioButton) findViewById(R.id.sampleSnailRadioButton);
 
-        vehicleAge = vehicleClass = vehicleCondition = "";
+        vehicleAge = "";
+        vehicleClass = "";
+        vehicleCondition = "";
 
         vehicleAgeSpinner = (Spinner) findViewById(R.id.vehicle_age);
         vehicleClassSpinner = (Spinner) findViewById(R.id.vehicle_type);
@@ -156,6 +158,7 @@ public class MainActivity extends AppCompatActivity implements OkHTTPAsync.OkHtt
         carAgeCategories.add("1 - 2 years");
         carAgeCategories.add("2 - 3 years");
         carAgeCategories.add("3 - 4 years");
+        carAgeCategories.add("4 - 5 years");
         carAgeCategories.add("> 5 years");
 
 
@@ -163,7 +166,7 @@ public class MainActivity extends AppCompatActivity implements OkHTTPAsync.OkHtt
         carClassCategories.add("Micro car");
         carClassCategories.add("Saloon car");
         carClassCategories.add("SUV");
-        carClassCategories.add("4 wheel drive");
+        carClassCategories.add("Offroad 4WD");
         carClassCategories.add("Bus");
 
 
@@ -199,7 +202,7 @@ public class MainActivity extends AppCompatActivity implements OkHTTPAsync.OkHtt
         phoneName = android.os.Build.BRAND;
 
         c = Calendar.getInstance();
-        sdfString = "dd-MM-yy";
+        sdfString = "dd-MM-yy-ss";
         sdf = new SimpleDateFormat(sdfString);
         timeStamp = sdf.format(c.getTime());
         fileExtension = ".txt";
@@ -212,6 +215,7 @@ public class MainActivity extends AppCompatActivity implements OkHTTPAsync.OkHtt
 
         androidId = Secure.getString(this.getContentResolver(),Secure.ANDROID_ID);
         filename = ""+androidId+"_"+phoneName+"_"+phoneModel+"_"+timeStamp+fileExtension;
+
 
         resetUploadButton();
     }
@@ -316,7 +320,7 @@ public class MainActivity extends AppCompatActivity implements OkHTTPAsync.OkHtt
 
         /******** Called when User on Gps  *********/
 
-        Toast.makeText(getBaseContext(), "Gps turned on ", Toast.LENGTH_LONG).show();
+        //Toast.makeText(getBaseContext(), "Gps turned on ", Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -331,21 +335,40 @@ public class MainActivity extends AppCompatActivity implements OkHTTPAsync.OkHtt
 
 
         Spinner spinner = (Spinner) parent;
-        if(spinner.getId() == R.id.vehicle_age)
-        {
-            vehicleAge = parent.getItemAtPosition(position).toString();
-        }
-        else if(spinner.getId() == R.id.vehicle_type)
-        {
-            vehicleClass = parent.getItemAtPosition(position).toString();
-        }else if(spinner.getId() == R.id.vehicle_condition)
-        {
-            vehicleCondition = parent.getItemAtPosition(position).toString();
+
+        if(spinner.getId() == R.id.vehicle_age){
+
+            vehicleAge = parent.getItemAtPosition(position).toString().toLowerCase().replaceAll("\\s+","");
+            vehicleAge = vehicleAge.substring(0,2);
         }
 
+        else if(spinner.getId() == R.id.vehicle_type){
 
-        // Showing selected spinner item
-        //Toast.makeText(parent.getContext(), "Selected: " + item, Toast.LENGTH_LONG).show();
+            vehicleClass = parent.getItemAtPosition(position).toString().toLowerCase();
+            String[] vClassExploded = vehicleClass.split(" ");
+
+            //save a few bytes by shortening
+            if(vClassExploded.length > 1){
+                vehicleClass = vClassExploded[0].charAt(0) + "" + vClassExploded[1].charAt(0);
+            }else{
+                vehicleClass = vClassExploded[0].charAt(0) + "";
+            }
+
+        }
+
+        else if(spinner.getId() == R.id.vehicle_condition){
+
+            vehicleCondition = parent.getItemAtPosition(position).toString().toLowerCase();
+            String[] vConditionExploded = vehicleCondition.split(" ");
+
+            //save a few bytes by shortening
+            if(vConditionExploded.length > 1){
+                vehicleCondition = vConditionExploded[0].charAt(0) + "" + vConditionExploded[1].charAt(0);
+            }else{
+                vehicleCondition = vConditionExploded[0].charAt(0)+"";
+            }
+        }
+
     }
 
     @Override
@@ -371,6 +394,10 @@ public class MainActivity extends AppCompatActivity implements OkHTTPAsync.OkHtt
                     "|"+vehicleAge+"|"+vehicleCondition+"\n";
             outputWriter.write(line);
             outputWriter.close();
+
+//            txtView.setText(vehicleAge + "\n" +
+//                    vehicleCondition + "\n" +
+//                    vehicleClass+"\n");
 
             //display file saved message
 //            Toast.makeText(getBaseContext(), "File saved successfully!",
@@ -400,12 +427,16 @@ public class MainActivity extends AppCompatActivity implements OkHTTPAsync.OkHtt
                 Toast.makeText(getBaseContext(), "Getting GPS lock. Might take a while", Toast.LENGTH_LONG).show();
             }
 
+            uploadFileButton.setVisibility(View.GONE);
+
+
         } else {
             senSensorManager.unregisterListener(this);
             sampleMidRadioButton.setEnabled(true);
             sampleFastRadioButton.setEnabled(true);
             sampleSlowRadioButton.setEnabled(true);
             sampleSnailRadioButton.setEnabled(true);
+
             resetUploadButton();
         }
     }
@@ -446,12 +477,10 @@ public class MainActivity extends AppCompatActivity implements OkHTTPAsync.OkHtt
     }
 
 
-
-
     public void writeClassToFile(String classification){
         try {
             outputStream = openFileOutput(filename, Context.MODE_APPEND);
-            String line = "\n******" + classification + "******\n";
+            String line = "\n******" + classification + "******\n\n";
             outputStream.write(line.getBytes());
             //outputStream.close();
         } catch (Exception e) {
@@ -619,15 +648,14 @@ public class MainActivity extends AppCompatActivity implements OkHTTPAsync.OkHtt
     }
 
     public void resetUploadButton(){
+
+        uploadFileButton.setText(String.valueOf(getDirSize()/1024)+"KB to upload");
+
         if(fileDirectoryIsEmpty()){
             uploadFileButton.setVisibility(View.GONE);
         }else {
             uploadFileButton.setVisibility(View.VISIBLE);
         }
-
-        Toast.makeText(getBaseContext(), "Reset called", Toast.LENGTH_SHORT).show();
-
-        uploadFileButton.setText(String.valueOf(getDirSize()/1024)+"KB to upload");
     }
 
 
@@ -669,9 +697,4 @@ public class MainActivity extends AppCompatActivity implements OkHTTPAsync.OkHtt
     }
 
 
-    @Override
-    public void call() {
-        resetUploadButton();
-        //Toast.makeText(getBaseContext(), "Call called", Toast.LENGTH_SHORT).show();
-    }
 }

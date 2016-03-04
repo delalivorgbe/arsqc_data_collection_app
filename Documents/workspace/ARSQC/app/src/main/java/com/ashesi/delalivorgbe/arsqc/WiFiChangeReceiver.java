@@ -25,7 +25,7 @@ public class WiFiChangeReceiver extends BroadcastReceiver {
         WifiManager wifi = (WifiManager)appContext.getSystemService(Context.WIFI_SERVICE);
 
         if (wifi.isWifiEnabled()){
-            Toast.makeText(appContext, "Wifi Enabled", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(appContext, "Wifi Enabled", Toast.LENGTH_SHORT).show();
 
             ConnectivityManager connManager = (ConnectivityManager) appContext.getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
@@ -45,7 +45,7 @@ public class WiFiChangeReceiver extends BroadcastReceiver {
             }
 
         }else{
-            Toast.makeText(appContext, "Wifi Disabled", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(appContext, "Wifi Disabled", Toast.LENGTH_SHORT).show();
             appContext.stopService(new Intent(appContext, UploadService.class));
         }
 
